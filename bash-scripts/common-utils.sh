@@ -6,8 +6,8 @@
 # Date: 2025-11-01
 # =========================================
 
-LOGFILE="/var/log/arquify-internal-services-deploy.log"
-LOGS_OWNER=maia
+LOGFILE="/var/log/arquify-internal-services-deployment.log"
+LOGS_OWNER=root
 LOGS_OWNER_PERMISSIONS=640
 LOGS_OWNER_GROUP=adm
 
