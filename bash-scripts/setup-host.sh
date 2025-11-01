@@ -15,7 +15,7 @@ show_menu() {
     echo " 🚀 Arquify Internal Services Control Menu"
     echo "==============================================="
     echo " 1) Configure Logrotate for Arquify logs"
-    echo " 2) Download internal services repository"
+    echo " 2) Install Docker"
     echo " 3) Configure Logrotate for Arquify logs"
     echo " 4) Install Docker"
     echo " 5) Install SFTP"
@@ -56,7 +56,7 @@ while true; do
             configure_logrotate
             ;;
         2)
-            configure_logrotate
+            install_docker
             ;;
         3)
             configure_logrotate
