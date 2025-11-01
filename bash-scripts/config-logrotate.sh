@@ -34,6 +34,7 @@ $LOGFILE {
     missingok
     notifempty
     create $PERMISSIONS $USER $GROUP
+    su $USER $GROUP
     sharedscripts
     postrotate
         systemctl reload rsyslog >/dev/null 2>&1 || true
