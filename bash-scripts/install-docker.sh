@@ -13,7 +13,7 @@ set -euo pipefail
 source "${IMPORT_UTILS_FILE}"
 
 log "🚀 Starting Docker installation..."
-require_user
+require_root_privilege
 
 run_and_log apt-get update -y
 run_and_log apt-get install -y ca-certificates curl

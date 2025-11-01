@@ -7,13 +7,13 @@
 # =========================================
 
 LOGFILE="/var/log/arquify-internal-services-deploy.log"
-REQUIRED_USER=maia
-REQUIRED_PERMISSIONS=640
-REQUIRED_GROUP=adm
+LOGS_OWNER=maia
+LOGS_OWNER_PERMISSIONS=640
+LOGS_OWNER_GROUP=adm
 
 log() {
     local logfile="${LOGFILE:?LOGFILE not set}"
-    local permissions="${REQUIRED_PERMISSIONS}"
+    local permissions="${LOGS_OWNER_PERMISSIONS}"
 
     local logdir
     logdir=$(dirname "$logfile")
@@ -35,25 +35,25 @@ log() {
     echo "[$(date '+%F %T')] $*" | tee -a "$logfile"
 }
 
-require_user() {
-    local required="${REQUIRED_USER:-root}"
+require_root_privilege() {
+    local required="root"
 
     local required_uid
     if [[ "$required" =~ ^[0-9]+$ ]]; then
         required_uid="$required"
     else
         required_uid=$(id -u "$required" 2>/dev/null) || {
-            log "BASH require_user -> ❌ User '$required' does not exist."
+            log "BASH require_root_privilege -> ❌ User '$required' does not exist."
             exit 1
         }
     fi
 
     if [[ "$EUID" -ne "$required_uid" ]]; then
-        log "BASH require_user -> ❌ Please run this script as user '$required' (UID $required_uid)."
+        log "BASH require_root_privilege -> ❌ Please run this script as user '$required' (UID $required_uid)."
         exit 1
     fi
 
-    log "BASH require_user -> ✅ Running as required user '$required' (UID $required_uid)."
+    log "BASH require_root_privilege -> ✅ Running as required user '$required' (UID $required_uid)."
 }
 
 

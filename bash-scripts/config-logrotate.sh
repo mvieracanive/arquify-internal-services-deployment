@@ -14,12 +14,12 @@ filename=$(basename "$LOGFILE" .log)
 CONF_FILE="/etc/logrotate.d/${filename}"
 ROTATE_SIZE="10M"      # Rotate when log is bigger than 10 MB
 ROTATE_COUNT=2         # Keep 2 old versions
-USER="${REQUIRED_USER}"
-PERMISSIONS="${REQUIRED_PERMISSIONS}"
-GROUP="${REQUIRED_GROUP}"
+USER="${LOGS_OWNER}"
+PERMISSIONS="${LOGS_OWNER_PERMISSIONS}"
+GROUP="${LOGS_OWNER_GROUP}"
 
 log "🚀 Starting Logrotate configuration..."
-require_user
+require_root_privilege
 
 if [[ -f "$CONF_FILE" ]]; then
     log "ℹ️ Logrotate configuration already exists: $CONF_FILE"
