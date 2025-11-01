@@ -19,14 +19,14 @@ log() {
     logdir=$(dirname "$logfile")
     if [[ ! -d "$logdir" ]]; then
         mkdir -p "$logdir" || {
-            echo "BASH log -> ❌ Failed to create log directory: $logdir" >&2
+            echo "❌ Failed to create log directory: $logdir" >&2
             exit 1
         }
     fi
 
     if [[ ! -f "$logfile" ]]; then
         touch "$logfile" || {
-            echo "BASH log -> ❌ Cannot create log file: $logfile" >&2
+            echo "❌ Cannot create log file: $logfile" >&2
             exit 1
         }
         chmod "$permissions" "$logfile"
@@ -43,28 +43,28 @@ require_root_privilege() {
         required_uid="$required"
     else
         required_uid=$(id -u "$required" 2>/dev/null) || {
-            log "BASH require_root_privilege -> ❌ User '$required' does not exist."
+            log "❌ User '$required' does not exist."
             exit 1
         }
     fi
 
     if [[ "$EUID" -ne "$required_uid" ]]; then
-        log "BASH require_root_privilege -> ❌ Please run this script as user '$required' (UID $required_uid)."
+        log "❌ Please run this script as user '$required' (UID $required_uid)."
         exit 1
     fi
 
-    log "BASH require_root_privilege -> ✅ Running as required user '$required' (UID $required_uid)."
+    log "✅ Running as required user '$required' (UID $required_uid)."
 }
 
 
 run_and_log() {
     local cmd="$*"
-    log "BASH rund and log -> ▶️ Running: $cmd"
+    log "▶️ Running: $cmd"
     if output=$($cmd 2>&1); then
         log "$output"
     else
-        log "BASH rund and log -> ❌ Command failed: $cmd"
-        log "BASH rund and log -> $output"
+        log "❌ Command failed: $cmd"
+        log "$output"
         exit 1
     fi
 }
