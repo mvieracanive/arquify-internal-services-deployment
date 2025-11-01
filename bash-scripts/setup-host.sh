@@ -32,7 +32,7 @@ configure_logrotate() {
 }
 
 install_docker() {
-  echo "installing docker...";
+  bash install-docker.sh;
 }
 
 install_sftp() {
