@@ -1,0 +1,35 @@
+services:
+  docmost:
+    image: docmost/docmost:latest
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_URL: ${DOCMOST_APP_URL}
+      APP_SECRET: ${DOCMOST_APP_SECRET}
+      DATABASE_URL: ${DOCMOST_DATABASE_URL}
+      REDIS_URL: 'redis://redis:6379'
+      DISABLE_TELEMETRY: true
+    ports:
+      - ${DOCMOST_EXPOSE_PORT}:3000
+    restart: unless-stopped
+    volumes:
+      - docmost:/app/data/storage
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+
+volumes:
+  docmost:
+  db_data:

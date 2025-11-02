@@ -16,8 +16,8 @@ show_menu() {
     echo "==============================================="
     echo " 1) Configure Logrotate for Arquify logs"
     echo " 2) Install Docker"
-    echo " 3) Configure Logrotate for Arquify logs"
-    echo " 4) Install Docker"
+    echo " 3) Backup Internal Services Data"
+    echo " 4) Restore Internal Services Data"
     echo " 5) Install SFTP"
     echo " 6) Install IpTable"
     echo " 7) Update and Patch System"
@@ -35,8 +35,12 @@ install_docker() {
   bash install-docker.sh;
 }
 
-install_sftp() {
-  echo "installing sftp...";
+backup() {
+  bash backup-docmost.sh;
+}
+
+restore() {
+    bash restore-docmost.sh
 }
 
 install_iptable() {
@@ -59,10 +63,10 @@ while true; do
             install_docker
             ;;
         3)
-            configure_logrotate
+            backup
             ;;
         4)
-            install_docker
+            restore
             ;;
         5)
             install_sftp

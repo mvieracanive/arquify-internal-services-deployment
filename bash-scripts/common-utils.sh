@@ -11,6 +11,12 @@ LOGS_OWNER=root
 LOGS_OWNER_PERMISSIONS=640
 LOGS_OWNER_GROUP=adm
 
+DOCKER_SERVICES_DIR="$(dirname "$0")/../docker-services"
+DOCKER_DOCMOST_VOLUME="docker-services_docmost"
+DOCKER_POSTGRES_VOLUME="docker-services_db_data"
+POSTGRES_CONTAINER_NAME=db
+DOCMOST_CONTAINER_NAME=docmost
+
 log() {
     local logfile="${LOGFILE:?LOGFILE not set}"
     local permissions="${LOGS_OWNER_PERMISSIONS}"
