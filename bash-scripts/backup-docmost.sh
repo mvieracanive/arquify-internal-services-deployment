@@ -69,4 +69,4 @@ docker compose -f "$composeFile" up -d
 log "✅ Containers restarted successfully."
 
 #-------------------Done-------------------
-log "🎉 Backup completed suc
+log "🎉 Backup completed successfully"
