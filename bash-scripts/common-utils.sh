@@ -15,7 +15,7 @@ DOCKER_SERVICES_DIR="$(dirname "$0")/../docker-services"
 DOCKER_DOCMOST_VOLUME="docker-services_docmost"
 DOCKER_POSTGRES_VOLUME="docker-services_db_data"
 POSTGRES_CONTAINER_NAME=db
-DOCMOST_CONTAINER_NAME=docmost
+DOCMOST_CONTAINER_NAME=docmost #used by restore with archiving
 
 log() {
     local logfile="${LOGFILE:?LOGFILE not set}"
