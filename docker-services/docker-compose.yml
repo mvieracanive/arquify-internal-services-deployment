@@ -10,6 +10,14 @@ services:
       DATABASE_URL: ${DOCMOST_DATABASE_URL}
       REDIS_URL: 'redis://redis:6379'
       DISABLE_TELEMETRY: true
+      MAIL_DRIVER: 'smtp'
+      MAIL_FROM_NAME: "Arquify Docmost"
+      MAIL_FROM_ADDRESS: ${DOCMOST_MAIL_FROM_ADDRESS}
+      SMTP_SECURE: ${SMTP_SECURE}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
     ports:
       - ${DOCMOST_EXPOSE_PORT}:3000
     restart: unless-stopped
