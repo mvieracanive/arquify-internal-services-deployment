@@ -9,11 +9,11 @@ services:
       APP_URL: ${DOCMOST_APP_URL}
       APP_SECRET: ${DOCMOST_APP_SECRET}
       DATABASE_URL: ${DOCMOST_DATABASE_URL}
-      REDIS_URL: 'redis://arquify_redis:6379'
+      REDIS_URL: ${DOCMOST_REDIS_URL}
       DISABLE_TELEMETRY: true
       MAIL_DRIVER: 'smtp'
-      MAIL_FROM_NAME: "Arquify Docmost"
-      MAIL_FROM_ADDRESS: ${DOCMOST_MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: "Arquify Wiki"
+      MAIL_FROM_ADDRESS: ${SMTP_NO_REPLY}
       SMTP_SECURE: ${SMTP_SECURE}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -47,11 +47,75 @@ services:
     networks:
       - arquify_network
 
+  arquify_mysql:
+    image: mysql:8.0
+    container_name: arquify_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}    
+      MYSQL_DATABASE: ${MYSQL_DATABASE}                    
+      MYSQL_USER: ${MYSQL_USER}                               
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    command: --character-set-server=UTF8MB4 --collation-server=UTF8MB4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - arquify_network
+
+  arquify_leantime:
+    image: leantime/leantime:3.5.12
+    container_name: arquify_leantime
+    restart: unless-stopped
+    ports:
+      - ${LEAN_PORT}:${LEAN_PORT}
+    environment:
+      LEAN_APP_DIR: ''
+      LEAN_DB_HOST: 'arquify_mysql' 
+      LEAN_DB_USER: ${MYSQL_USER}                            
+      LEAN_DB_PASSWORD: ${MYSQL_PASSWORD}                 
+      LEAN_DB_DATABASE: ${MYSQL_DATABASE}                  
+      LEAN_DB_PORT: '3306'                       
+      LEAN_DEBUG: 0
+      LEAN_SITENAME: 'Arquify Proyect'                   
+      LEAN_LANGUAGE: 'en-US'
+      LEAN_DEFAULT_TIMEZONE: 'Europe/Madrid'
+      LEAN_ENABLE_MENU_TYPE: false
+      LEAN_LOG_PATH: 'null' 
+      LEAN_USER_FILE_PATH: 'userfiles/'
+      LEAN_DB_BACKUP_PATH: 'backupdb/'
+      LEAN_PORT: ${LEAN_PORT}                        
+      LEAN_APP_URL: ${LEAN_APP_URL}  
+      LEAN_SESSION_PASSWORD: ${LEAN_SESSION_PASSWORD}
+      LEAN_SESSION_EXPIRATION: ${LEAN_SESSION_EXPIRATION}
+      LEAN_EMAIL_RETURN: ${SMTP_NO_REPLY}
+      LEAN_EMAIL_USE_SMTP: true            
+      LEAN_EMAIL_SMTP_HOSTS: ${SMTP_HOST}    
+      LEAN_EMAIL_SMTP_AUTH: true                  
+      LEAN_EMAIL_SMTP_USERNAME: ${SMTP_USERNAME}  
+      LEAN_EMAIL_SMTP_PASSWORD: ${SMTP_PASSWORD}    
+      LEAN_EMAIL_SMTP_AUTO_TLS: true    
+      LEAN_EMAIL_SMTP_SECURE: 'STARTTLS' 
+      LEAN_EMAIL_SMTP_SSLNOVERIFY: false 
+      LEAN_EMAIL_SMTP_PORT: ${SMTP_PORT} 
+    networks:
+      - arquify_network
+    volumes:
+      - lean_public_data:/var/www/html/public/userfiles
+      - lean_data:/var/www/html/userfiles
+    depends_on:
+      - arquify_mysql
+
 volumes:
   docmost_data:
     name: arquify_docmost_volume
   postgres_data:
     name: arquify_postgres_volume
+  mysql_data:
+    name: arquify_mysql_volume
+  lean_public_data:
+    name: lean_public_volume
+  lean_data:
+    name: lean_volume
 
 networks:
   arquify_network:
