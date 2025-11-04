@@ -17,7 +17,7 @@ envFile=${DOCKER_SERVICES_DIR}/.env
 composeFile="$DOCKER_SERVICES_DIR/docker-compose.yml"
 docmostVolume=${DOCKER_DOCMOST_VOLUME}
 postgresVolume=${DOCKER_POSTGRES_VOLUME}
-postgresContainerName=${POSTGRES_CONTAINER_NAME:-db}
+postgresContainerName=${POSTGRES_CONTAINER_NAME}
 postgresDbName=${POSTGRES_DB:-docmost}
 
 log "🚀 Sourcing environment variables from file $envFile..."
@@ -88,25 +88,21 @@ rm -rf "${docmostPath:?}"/* || true
 tar -xzf "$docmostBackup" -C "$docmostPath"
 log "✅ Docmost volume restored from: $docmostBackup"
 
-#-------------------Erase PostgreSQL volume and restore DB-------------------
+#-------------------Restore PostgreSQL database from dump-------------------
 log "🐘 Restoring PostgreSQL database from dump..."
-
-postgresPath=$(docker volume inspect "$postgresVolume" --format '{{ .Mountpoint }}' 2>/dev/null || true)
-if [[ -z "$postgresPath" ]]; then
-  log "❌ PostgreSQL volume ($postgresVolume) not found. Creating it..."
-  docker volume create "$postgresVolume" >/dev/null
-  postgresPath=$(docker volume inspect "$postgresVolume" --format '{{ .Mountpoint }}')
-fi
-
-log "🧹 Erasing PostgreSQL volume contents..."
-rm -rf "${postgresPath:?}"/* || true
 
 : "${POSTGRES_USER:?Missing POSTGRES_USER in .env}"
 : "${POSTGRES_PASSWORD:?Missing POSTGRES_PASSWORD in .env}"
 
-log "🚀 Starting PostgreSQL container..."
+log "🚀 Starting PostgreSQL container (if not already running)..."
 docker compose -f "$composeFile" up -d "$postgresContainerName"
-sleep 10
+
+# Wait until PostgreSQL is ready to accept connections
+log "⏳ Waiting for PostgreSQL to be ready..."
+until docker exec -i "$postgresContainerName" pg_isready -U "${POSTGRES_USER}" >/dev/null 2>&1; do
+  sleep 2
+done
+log "✅ PostgreSQL is ready."
 
 container_id=$(docker compose -f "$composeFile" ps -q "$postgresContainerName")
 if [[ -z "$container_id" ]]; then
@@ -114,7 +110,19 @@ if [[ -z "$container_id" ]]; then
   exit 1
 fi
 
-log "📥 Importing SQL dump into new PostgreSQL instance..."
+log "🧹 Terminating active connections to \"$postgresDbName\"..."
+docker exec -i -e PGPASSWORD="${POSTGRES_PASSWORD}" "$container_id" \
+  psql -U "${POSTGRES_USER}" -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='${postgresDbName}';"
+
+log "🧹 Dropping existing database \"$postgresDbName\" (if it exists)..."
+docker exec -i -e PGPASSWORD="${POSTGRES_PASSWORD}" "$container_id" \
+  psql -U "${POSTGRES_USER}" -d postgres -c "DROP DATABASE IF EXISTS \"${postgresDbName}\";"
+
+log "🆕 Creating fresh database \"$postgresDbName\"..."
+docker exec -i -e PGPASSWORD="${POSTGRES_PASSWORD}" "$container_id" \
+  psql -U "${POSTGRES_USER}" -d postgres -c "CREATE DATABASE \"${postgresDbName}\";"
+
+log "📥 Importing SQL dump into \"$postgresDbName\"..."
 gunzip -c "$postgresDump" | docker exec -i -e PGPASSWORD="${POSTGRES_PASSWORD}" "$container_id" \
   psql -U "${POSTGRES_USER}" -d "$postgresDbName"
 

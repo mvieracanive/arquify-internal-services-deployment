@@ -1,14 +1,15 @@
 services:
-  docmost:
+  arquify_docmost:
     image: docmost/docmost:0.23.2
+    container_name: arquify_docmost
     depends_on:
-      - db
-      - redis
+      - arquify_postgres
+      - arquify_redis
     environment:
       APP_URL: ${DOCMOST_APP_URL}
       APP_SECRET: ${DOCMOST_APP_SECRET}
       DATABASE_URL: ${DOCMOST_DATABASE_URL}
-      REDIS_URL: 'redis://redis:6379'
+      REDIS_URL: 'redis://arquify_redis:6379'
       DISABLE_TELEMETRY: true
       MAIL_DRIVER: 'smtp'
       MAIL_FROM_NAME: "Arquify Docmost"
@@ -23,9 +24,12 @@ services:
     restart: unless-stopped
     volumes:
       - docmost:/app/data/storage
+    networks:
+      - arquify_network
 
-  db:
+  arquify_postgres:
     image: postgres:16-alpine
+    container_name: arquify_postgres
     environment:
       POSTGRES_DB: docmost
       POSTGRES_USER: ${POSTGRES_USER}
@@ -33,11 +37,21 @@ services:
     restart: unless-stopped
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - arquify_network
 
-  redis:
+  arquify_redis:
     image: redis:7.2-alpine
+    container_name: arquify_redis
     restart: unless-stopped
+    networks:
+      - arquify_network
 
 volumes:
   docmost:
   db_data:
+
+networks:
+  arquify_network:
+    name: arquify_network
+    driver: bridge 
