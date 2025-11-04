@@ -23,7 +23,7 @@ services:
       - ${DOCMOST_EXPOSE_PORT}:3000
     restart: unless-stopped
     volumes:
-      - docmost:/app/data/storage
+      - docmost_data:/app/data/storage
     networks:
       - arquify_network
 
@@ -36,7 +36,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: unless-stopped
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - arquify_network
 
@@ -48,8 +48,10 @@ services:
       - arquify_network
 
 volumes:
-  docmost:
-  db_data:
+  docmost_data:
+    name: arquify_docmost_volume
+  postgres_data:
+    name: arquify_postgres_volume
 
 networks:
   arquify_network:

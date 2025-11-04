@@ -12,8 +12,8 @@ LOGS_OWNER_PERMISSIONS=640
 LOGS_OWNER_GROUP=adm
 
 DOCKER_SERVICES_DIR="$(dirname "$0")/../docker-services"
-DOCKER_DOCMOST_VOLUME="docker-services_docmost"
-DOCKER_POSTGRES_VOLUME="docker-services_db_data"
+DOCKER_DOCMOST_VOLUME="arquify_docmost_volume"
+DOCKER_POSTGRES_VOLUME="arquify_postgres_volume"
 POSTGRES_CONTAINER_NAME=arquify_postgres
 
 log() {
